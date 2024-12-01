@@ -1,10 +1,11 @@
 import sys
+from typing import List
 
-def get_size_in_mb(obj):
+def get_size_in_mb(obj: object) -> float:
     size_in_bytes = sys.getsizeof(obj)
     size_in_mb = size_in_bytes / (1024 * 1024)  # Convert bytes to MB
     return size_in_mb
-def split_into_batches(records):
+def split_into_batches(records: List[str]) -> List[List[str]]:
     """
     Split records into batches
     :param records:
