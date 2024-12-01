@@ -1,15 +1,41 @@
 import sys
-from typing import List
+from typing import List, Any
 
-def get_size_in_mb(obj: object) -> float:
+
+def get_size_in_mb(obj: Any) -> float:
+    """
+    Calculate the size of an object in megabytes (MB).
+
+    Args:
+        obj: The object whose size is to be calculated. Can be of any type.
+
+    Returns:
+        float: The size of the object in MB.
+    """
     size_in_bytes = sys.getsizeof(obj)
     size_in_mb = size_in_bytes / (1024 * 1024)  # Convert bytes to MB
     return size_in_mb
-def split_into_batches(records: List[str]) -> List[List[str]]:
+def split_into_batches(records: List[Any]) -> List[List[Any]]:
     """
-    Split records into batches
-    :param records:
-    :return:
+    Splits a list of records into batches based on size and record count constraints.
+
+    The function ensures that no batch exceeds the following limits:
+    - Maximum size of a record: 1 MB.
+    - Maximum size of a batch: 5 MB.
+    - Maximum number of records in a batch: 500.
+
+    If any record exceeds the maximum size limit, it is discarded.
+
+    Args:
+        records: A list of records, where each record can be of any type. Each record will be evaluated based on its size.
+
+    Returns:
+        List[List[Any]]: A list of batches, each containing a list of records. The batches will meet the size and record count constraints.
+
+    Example:
+        records = ["a" * (512 * 1024), "b" * (1024 * 1024)]
+        batches = split_into_batches(records)
+        # Returns a list of batches containing records, ensuring each batch is under the constraints.
     """
 
     MAX_RECORD_SIZE = 1  # 1MB
@@ -43,7 +69,7 @@ def split_into_batches(records: List[str]) -> List[List[str]]:
     return batches
 
 if __name__ == '__main__':
-    # Example with records that will require multiple batches
+    # Example usage with records that will require multiple batches
     records = [
         "x" * (512 * 1024),  # 512 KB
         "y" * (512 * 1024),  # 512 KB
