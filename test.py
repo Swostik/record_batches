@@ -1,5 +1,4 @@
 import sys
-
 import pytest
 from main import get_size_in_mb, split_into_batches
 
