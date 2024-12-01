@@ -2,11 +2,13 @@ import sys
 import pytest
 from main import get_size_in_mb, split_into_batches
 
+
 def test_get_size_in_mb_string():
     test_string = "Hello"
     expected_size = sys.getsizeof(test_string) / (1024 * 1024)
     actual_size = get_size_in_mb(test_string)
     assert actual_size == pytest.approx(expected_size, rel=1e-4)
+
 
 def test_get_size_in_mb_large_object():
     large_string = "a" * (1024 * 1024)  # 1 MB string
@@ -14,11 +16,13 @@ def test_get_size_in_mb_large_object():
     actual_size = get_size_in_mb(large_string)
     assert actual_size == pytest.approx(expected_size, rel=1e-4)
 
+
 def test_split_into_batches_single_batch():
     records = ["a" * (512 * 1024)] * 3  # Three 0.5 MB records
     batches = split_into_batches(records)
     assert len(batches) == 1
     assert len(batches[0]) == 3
+
 
 def test_split_into_batches_multiple_batches():
     records = ["a" * (512 * 1024)] * 18  # Ten 0.5 MB records
@@ -26,6 +30,7 @@ def test_split_into_batches_multiple_batches():
     assert len(batches) == 2
     assert len(batches[0]) == 9
     assert len(batches[1]) == 9
+
 
 def test_discard_large_records():
     # Records larger than 1 MB (should be discarded)
@@ -37,6 +42,7 @@ def test_discard_large_records():
     assert len(batches) == 1  # One batch
     assert len(batches[0]) == 1  # One record in the batch
     assert len(batches[0][0]) == 512 * 1024  # Size of the second record (0.5 MB)
+
 
 def test_batch_size_limit():
     # 10 records, each of 0.5 MB (Total = 10 * 0.5 MB = 5 MB)
@@ -71,4 +77,3 @@ def test_split_batches_by_record_count():
     for i, batch in enumerate(batches):
         total_size_batch = sum(get_size_in_mb(record) for record in batch)
         assert total_size_batch <= 5.0, f"Batch {i + 1} exceeds 5 MB. Size: {total_size_batch} MB"
-

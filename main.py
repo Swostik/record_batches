@@ -1,5 +1,12 @@
 import sys
 from typing import List, Any
+import logging
+# Set up logging configuration to log only to a file
+logging.basicConfig(
+    filename='batch_processing.log',
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 
 def get_size_in_mb(obj: Any) -> float:
@@ -15,6 +22,8 @@ def get_size_in_mb(obj: Any) -> float:
     size_in_bytes = sys.getsizeof(obj)
     size_in_mb = size_in_bytes / (1024 * 1024)  # Convert bytes to MB
     return size_in_mb
+
+
 def split_into_batches(records: List[Any]) -> List[List[Any]]:
     """
     Splits a list of records into batches based on size and record count constraints.
@@ -42,31 +51,37 @@ def split_into_batches(records: List[Any]) -> List[List[Any]]:
     MAX_BATCH_SIZE = 5  # 5 MB
     MAX_BATCH_COUNT = 500  # maximum number of records allowed in a batch
 
-
-    #empty list to store batches of records
+    # empty list to store batches of records
     batches = []
     current_batch = []
     current_batch_size = 0  # to track the current batch in bytes
+    batch_number = 1 # starting batch number to track the number of batches
 
     for record in records:
         record_size = get_size_in_mb(record)
 
         if record_size > MAX_RECORD_SIZE:
+            logging.info(f"Record discarded due to size: {record_size:.2f} MB")
             continue
 
         if (current_batch_size + record_size > MAX_BATCH_SIZE) or (len(current_batch) >= MAX_BATCH_COUNT):
+            logging.info(f"Batch {batch_number} size exceeded or batch count reached. Starting new batch.")
             batches.append(current_batch)
             current_batch = []
             current_batch_size = 0
+            batch_number += 1
 
         current_batch.append(record)
         current_batch_size += record_size
+        logging.info(f"Added record of size {record_size:.2f} MB to Batch {batch_number}.")
 
     # Add the last batch if it has records
     if current_batch:
         batches.append(current_batch)
+        logging.info(f"Final Batch {batch_number} added with {len(current_batch)} records.")
 
     return batches
+
 
 if __name__ == '__main__':
     # Example usage with records that will require multiple batches
@@ -85,9 +100,4 @@ if __name__ == '__main__':
     batches = split_into_batches(records)
     print(f"Number of batches: {len(batches)}")
     for i, batch in enumerate(batches):
-        print(f"Batch {i + 1}: {len(batch)} records, Size: {round(sum(get_size_in_mb(r) for r in batch),2)} MB")
-
-
-
-
-
+        print(f"Batch {i + 1}: {len(batch)} records, Size: {round(sum(get_size_in_mb(r) for r in batch), 2)} MB")
