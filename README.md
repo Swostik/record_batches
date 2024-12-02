@@ -24,5 +24,5 @@ This program provides two main functionalities:
     - The main function for batch processing can be found in **main.py**.
    
 *** Note  
-- There is also a **test.py** file and we will need pytest to run those test files.
+- There is also a **test.py** file for running tests. You will need **pytest** to execute these tests.
 - Logging is set up to track the batch processing steps, with logs being saved to **batch_processing.log** in the same directory for easy monitoring and debugging.    
