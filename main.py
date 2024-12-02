@@ -61,7 +61,7 @@ def split_into_batches(records: List[Any]) -> List[List[Any]]:
         record_size = get_size_in_mb(record)
 
         if record_size > MAX_RECORD_SIZE:
-            logging.info(f"Record discarded due to size: {record_size:.2f} MB")
+            logging.warning(f"Record discarded due to size: {record_size:.2f} MB")
             continue
 
         if (current_batch_size + record_size > MAX_BATCH_SIZE) or (len(current_batch) >= MAX_BATCH_COUNT):
@@ -80,24 +80,7 @@ def split_into_batches(records: List[Any]) -> List[List[Any]]:
         batches.append(current_batch)
         logging.info(f"Final Batch {batch_number} added with {len(current_batch)} records.")
 
-    return batches
-
-
-if __name__ == '__main__':
-    # Example usage with records that will require multiple batches
-    records = [
-        "x" * (512 * 1024),  # 512 KB
-        "y" * (512 * 1024),  # 512 KB
-        "z" * (512 * 1024),  # 512 KB
-        "w" * (512 * 1024),  # 512 KB
-        "a" * (1024 * 1023),  # 1 MB (exact limit)
-        "b" * (1024 * 1023),  # 512 KB
-        "c" * (512 * 1024),  # 512 KB
-        "d" * (512 * 1024),  # 512 KB
-        "e" * (512 * 1024),  # 512 KB
-    ]
-
-    batches = split_into_batches(records)
-    print(f"Number of batches: {len(batches)}")
     for i, batch in enumerate(batches):
-        print(f"Batch {i + 1}: {len(batch)} records, Size: {round(sum(get_size_in_mb(r) for r in batch), 2)} MB")
+        batch_size = round(sum(get_size_in_mb(r) for r in batch), 2)
+        logging.info(f"Batch {i + 1}: {len(batch)} records, Size: {batch_size} MB")
+    return batches
